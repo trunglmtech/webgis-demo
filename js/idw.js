@@ -16,32 +16,45 @@
  * @param {Number} soCot  - Số cột của lưới
  * @returns {Object}     - { luoi, latMin, latMax, lngMin, lngMax, soDong, soCot }
  */
-function tinhIdw(diem, soDong, soCot) {
-    // 1. Tìm khung bao quanh tất cả điểm đo
-    var latMin = Infinity, latMax = -Infinity;
-    var lngMin = Infinity, lngMax = -Infinity;
+function tinhIdw(diem, soDong, soCot, ranhGioi) {
+    // 1. Xác định khung tính
+    var latMin, latMax, lngMin, lngMax;
 
-    diem.forEach(function (d) {
-        if (d.viDo < latMin) latMin = d.viDo;
-        if (d.viDo > latMax) latMax = d.viDo;
-        if (d.kinhDo < lngMin) lngMin = d.kinhDo;
-        if (d.kinhDo > lngMax) lngMax = d.kinhDo;
-    });
+    if (ranhGioi && ranhGioi.length) {
+        // Nếu có ranh giới khuôn viên: dùng đúng khung của khuôn viên
+        latMin = Infinity; latMax = -Infinity;
+        lngMin = Infinity; lngMax = -Infinity;
+        ranhGioi.forEach(function (p) {
+            if (p[0] < latMin) latMin = p[0];
+            if (p[0] > latMax) latMax = p[0];
+            if (p[1] < lngMin) lngMin = p[1];
+            if (p[1] > lngMax) lngMax = p[1];
+        });
+    } else {
+        // Không có ranh giới: dùng khung bao quanh các điểm đo
+        latMin = Infinity; latMax = -Infinity;
+        lngMin = Infinity; lngMax = -Infinity;
+        diem.forEach(function (d) {
+            if (d.viDo < latMin) latMin = d.viDo;
+            if (d.viDo > latMax) latMax = d.viDo;
+            if (d.kinhDo < lngMin) lngMin = d.kinhDo;
+            if (d.kinhDo > lngMax) lngMax = d.kinhDo;
+        });
 
-    // 2. Mở rộng khung một chút (5%) quanh các điểm đo
-    var padLat = (latMax - latMin) * 0.05;
-    var padLng = (lngMax - lngMin) * 0.05;
-    latMin -= padLat; latMax += padLat;
-    lngMin -= padLng; lngMax += padLng;
+        var padLat = (latMax - latMin) * 0.05;
+        var padLng = (lngMax - lngMin) * 0.05;
+        latMin -= padLat; latMax += padLat;
+        lngMin -= padLng; lngMax += padLng;
+    }
 
-    // 3. Tính lại số cột cho đúng tỉ lệ thực tế của khung
+    // 2. Tính lại số cột cho đúng tỉ lệ thực tế của khung
     //    (mỗi ô lưới phải là hình vuông, nếu không ảnh sẽ bị méo)
     var vLatMet = (latMax - latMin) * 111000;                                  // chiều cao (m)
     var langMet = (lngMax - lngMin) * 111000 * Math.cos(((latMin + latMax) / 2) * Math.PI / 180); // chiều rộng (m)
 
     soCot = Math.max(10, Math.round(soDong * (langMet / vLatMet)));
 
-    // 4. Tính giá trị dBm cho từng ô lưới
+    // 3. Tính giá trị dBm cho từng ô lưới
     var luoi = [];
 
     for (var i = 0; i < soDong; i++) {

@@ -34,18 +34,51 @@ chuGiai.onAdd = function () {
         html += '<div class="dong"><i style="background:' + m.mau + '"></i>' + m.ten + "</div>";
     });
     html += '<div style="margin-top:10px;border-top:1px solid #e0e4e8;padding-top:8px;">' +
-            '<div class="dong"><i style="background:#fff;border-radius:50%;border:2px solid #333"></i>Điểm đo</div></div>';
+            '<div class="dong"><i style="background:#fff;border-radius:50%;border:2px solid #333"></i>Điểm đo</div>' +
+            '<div class="dong"><i style="background:#e8d5f2;border:2px solid #7b2d8e"></i>Ranh giới trường</div></div>';
     div.innerHTML = html;
     return div;
 };
 chuGiai.addTo(map);
 
-// ---------- 3. Vẽ vùng phủ sóng IDW ----------
+// ---------- 3. Vẽ ranh giới khuôn viên trường ----------
+function diemTrongDaGiac(lat, lng, daGiac) {
+    // Thuật toán tia (ray casting): đếm số lần tia từ điểm cắt qua các cạnh
+    var benTrong = false;
+    for (var i = 0, j = daGiac.length - 1; i < daGiac.length; j = i++) {
+        var yi = daGiac[i][0], xi = daGiac[i][1];
+        var yj = daGiac[j][0], xj = daGiac[j][1];
+
+        var cat = ((yi > lat) !== (yj > lat)) &&
+                  (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+
+        if (cat) benTrong = !benTrong;
+    }
+    return benTrong;
+}
+
+var lopRanhGioi = null;
+
+if (typeof RANH_GIOI_KHUON_VIEN !== "undefined" && RANH_GIOI_KHUON_VIEN.length > 0) {
+    lopRanhGioi = L.polygon(RANH_GIOI_KHUON_VIEN, {
+        color: "#7b2d8e",
+        weight: 2.5,
+        fillColor: "#e8d5f2",
+        fillOpacity: 0.18,
+        dashArray: null
+    }).addTo(map);
+
+    // Cho bản đồ tự căn theo ranh giới khuôn viên
+    map.fitBounds(lopRanhGioi.getBounds(), { padding: [20, 20] });
+}
+
+// ---------- 4. Vẽ vùng phủ sóng IDW (giống bản đồ phủ sóng 4G/5G) ----------
+// Gọi server lấy lưới IDW, vẽ thành 1 ảnh canvas rồi đặt lên bản đồ
 var lopVungPhu = null;
 
 function veVungPhu() {
-    // Tính lưới IDW: số hàng cố định, số cột tự tính theo tỉ lệ khung
-    var ketQua = tinhIdw(DIEM_DO, 150, 200);
+    // Tính lưới IDW theo khung RANH GIỚI khuôn viên (không phải khung điểm đo)
+    var ketQua = tinhIdw(DIEM_DO, 200, 200, RANH_GIOI_KHUON_VIEN);
     var soDong = ketQua.soDong;
     var soCot = ketQua.soCot;
 
@@ -58,14 +91,34 @@ function veVungPhu() {
     var anh = ctx.createImageData(soCot, soDong);
     var duLieuAnh = anh.data;
 
+    // Bước lưới (độ)
+    var buocLat = (ketQua.latMax - ketQua.latMin) / (soDong - 1);
+    var buocLng = (ketQua.lngMax - ketQua.lngMin) / (soCot - 1);
+
     // Đổ màu từng ô
     // LƯU Ý: lưới tính từ latMin (phía Nam) lên latMax (phía Bắc),
-    // nhưng ảnh thì hàng 0 nằm ở TRÊN (phía Bắc).
-    // Nên phải đảo thứ tự hàng khi vẽ, nếu không ảnh sẽ bị lật Bắc - Nam.
+    // nhưng ảnh thì hàng 0 nằm ở TRÊN (phía Bắc). Nên phải đảo thứ tự hàng.
     for (var i = 0; i < soDong; i++) {
         var hangLuoi = soDong - 1 - i;   // đảo hàng
+        var latO = ketQua.latMin + buocLat * hangLuoi;
 
         for (var j = 0; j < soCot; j++) {
+            var lngO = ketQua.lngMin + buocLng * j;
+
+            var idx = (i * soCot + j) * 4;
+
+            // Chỉ tô màu nếu ô nằm TRONG ranh giới khuôn viên
+            var trongKhuonVien = true;
+            if (RANH_GIOI_KHUON_VIEN && RANH_GIOI_KHUON_VIEN.length > 0) {
+                trongKhuonVien = diemTrongDaGiac(latO, lngO, RANH_GIOI_KHUON_VIEN);
+            }
+
+            if (!trongKhuonVien) {
+                // Ngoài khuôn viên: trong suốt
+                duLieuAnh[idx + 3] = 0;
+                continue;
+            }
+
             var dbm = ketQua.luoi[hangLuoi][j];
             var mauHex = layMau(dbm);
 
@@ -74,7 +127,6 @@ function veVungPhu() {
             var g = parseInt(mauHex.substr(3, 2), 16);
             var b = parseInt(mauHex.substr(5, 2), 16);
 
-            var idx = (i * soCot + j) * 4;
             duLieuAnh[idx] = r;
             duLieuAnh[idx + 1] = g;
             duLieuAnh[idx + 2] = b;
@@ -86,16 +138,13 @@ function veVungPhu() {
 
     // Khung tọa độ: latMin/latMax/lngMin/lngMax là TÂM ô đầu và TÂM ô cuối.
     // Mỗi ô rộng đúng 1 bước lưới, nên khung ảnh phải mở rộng thêm nửa bước mỗi phía.
-    var buocLat = (ketQua.latMax - ketQua.latMin) / (soDong - 1);
-    var buocLng = (ketQua.lngMax - ketQua.lngMin) / (soCot - 1);
-
     var khung = [
         [ketQua.latMin - buocLat / 2, ketQua.lngMin - buocLng / 2],
         [ketQua.latMax + buocLat / 2, ketQua.lngMax + buocLng / 2]
     ];
 
     lopVungPhu = L.imageOverlay(cv.toDataURL(), khung, {
-        opacity: 0.62,
+        opacity: 0.72,
         interactive: false
     });
 
@@ -130,8 +179,13 @@ DIEM_DO.forEach(function (d) {
     dsMarker.push(marker);
 });
 
-// Vẽ vùng phủ trước, điểm đo đè lên trên
+// Vẽ vùng phủ trước, rồi đưa ranh giới + điểm đo lên trên
 veVungPhu();
+
+// Đảm bảo thứ tự lớp: vùng màu (dưới) -> ranh giới -> điểm đo (trên)
+if (lopVungPhu) lopVungPhu.bringToBack();
+if (lopRanhGioi) lopRanhGioi.bringToFront();
+dsMarker.forEach(function (m) { m.bringToFront(); });
 
 // ---------- 5. Bật/tắt vùng phủ sóng ----------
 document.getElementById("batVungPhu").addEventListener("change", function () {
