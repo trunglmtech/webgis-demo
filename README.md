@@ -32,7 +32,8 @@ Bản đồ nền lấy từ **OpenStreetMap**, dữ liệu là **15 điểm đo
 | Chức năng | Mô tả |
 |---|---|
 | **Bản đồ tương tác** | Zoom, kéo bản đồ, xem bản đồ nền OpenStreetMap |
-| **Vùng phủ sóng** | Nội suy IDW từ 15 điểm đo, hiển thị 5 mức màu liên tục |
+| **Ranh giới khuôn viên** | Vẽ polygon ranh giới trường (nguồn OpenStreetMap, 66 điểm) |
+| **Vùng phủ sóng** | Nội suy IDW từ 15 điểm đo, **cắt theo ranh giới khuôn viên**, hiển thị 5 mức màu |
 | **Điểm đo** | Hiển thị 15 điểm đo với màu theo cường độ tín hiệu |
 | **Popup thông tin** | Click vào điểm để xem tên, dBm, mức, tọa độ |
 | **Lọc dữ liệu** | Lọc theo tên điểm, theo mức tín hiệu, theo ngưỡng dBm |
@@ -48,7 +49,7 @@ Bản đồ nền lấy từ **OpenStreetMap**, dữ liệu là **15 điểm đo
 
 ![Bản đồ vùng phủ sóng](docs/demo-ban-do.png)
 
-*Vùng màu được nội suy bằng IDW từ 15 điểm đo. Màu xanh = tín hiệu mạnh, màu đỏ = tín hiệu yếu.*
+*Vùng màu được nội suy bằng IDW từ 15 điểm đo và **cắt theo ranh giới khuôn viên trường** (đường tím). Màu xanh = tín hiệu mạnh, màu đỏ = tín hiệu yếu.*
 
 ### Bảng thống kê
 
@@ -89,8 +90,11 @@ webgis-demo/
 │   └── style.css       # Toàn bộ giao diện
 ├── js/
 │   ├── data.js         # Dữ liệu 15 điểm đo + ngưỡng phân loại
+│   ├── ranhgioi.js     # Ranh giới khuôn viên trường (66 điểm, từ OpenStreetMap)
 │   ├── idw.js          # Thuật toán nội suy IDW
 │   └── map.js          # Khởi tạo bản đồ, vẽ, lọc, thống kê
+├── docs/
+│   └── demo-ban-do.png # Ảnh chụp màn hình
 ├── README.md
 └── LICENSE
 ```
@@ -100,8 +104,10 @@ webgis-demo/
 | File | Nội dung |
 |---|---|
 | `data.js` | Danh sách điểm đo (tên, vĩ độ, kinh độ, dBm) và bảng ngưỡng/màu |
+| `data.js` | Danh sách điểm đo (tên, vĩ độ, kinh độ, dBm) và bảng ngưỡng/màu |
+| `ranhgioi.js` | Mảng 66 tọa độ tạo thành polygon ranh giới khuôn viên trường |
 | `idw.js` | Hàm `tinhIdw()` — tính giá trị dBm cho từng ô lưới |
-| `map.js` | Tạo bản đồ, chú giải, vẽ vùng phủ, vẽ điểm, lọc, thống kê |
+| `map.js` | Tạo bản đồ, chú giải, vẽ ranh giới, vẽ vùng phủ (cắt theo ranh giới), vẽ điểm, lọc, thống kê |
 | `index.html` | Khung giao diện: thanh tiêu đề, thanh lọc, khung bản đồ |
 | `style.css` | Định dạng toàn bộ: màu sắc, bố cục, popup, chú giải |
 
