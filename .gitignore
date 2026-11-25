@@ -1,0 +1,15 @@
+# Thư mục phát triển (không đưa lên GitHub Pages)
+_dev/
+
+# Hệ điều hành
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Trình soạn thảo
+.vscode/
+.idea/
+*.swp
+
+# Log
+*.log

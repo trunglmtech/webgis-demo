@@ -1,0 +1,316 @@
+/* ===================================================
+   WebGIS Demo - Phủ sóng WiFi Đại học Nha Trang
+   =================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #f4f6f8;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ---------------- Thanh tiêu đề ---------------- */
+.thanh-tieu-de {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #0f2740 0%, #1e4976 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+    z-index: 1000;
+}
+
+.logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: #33a06b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: .5px;
+    flex-shrink: 0;
+}
+
+.tieu-de h1 {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: .3px;
+}
+
+.tieu-de p {
+    font-size: 12.5px;
+    opacity: .8;
+    margin-top: 2px;
+}
+
+.thong-tin-du-lieu {
+    margin-left: auto;
+    background: rgba(255, 255, 255, .12);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* ---------------- Thanh lọc ---------------- */
+.thanh-loc {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px;
+    padding: 12px 24px;
+    background: #fff;
+    border-bottom: 1px solid #e0e4e8;
+    z-index: 999;
+}
+
+.thanh-loc .nhom {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.thanh-loc label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: #7a8999;
+    font-weight: 600;
+}
+
+.thanh-loc input[type="text"],
+.thanh-loc input[type="number"],
+.thanh-loc select {
+    padding: 7px 10px;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    font-size: 13.5px;
+    background: #fff;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+.thanh-loc input[type="text"] {
+    min-width: 200px;
+}
+
+.thanh-loc input[type="number"] {
+    width: 90px;
+}
+
+.thanh-loc input:focus,
+.thanh-loc select:focus {
+    outline: none;
+    border-color: #1e4976;
+    box-shadow: 0 0 0 3px rgba(30, 73, 118, .12);
+}
+
+.nhom-ngang {
+    display: flex;
+    gap: 6px;
+}
+
+.thanh-loc .nut {
+    flex-direction: row;
+    gap: 8px;
+}
+
+.btn {
+    padding: 7px 18px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform .1s, opacity .15s;
+}
+
+.btn:active {
+    transform: scale(.97);
+}
+
+.btn-chinh {
+    background: #1e4976;
+    color: #fff;
+}
+
+.btn-chinh:hover {
+    background: #163a5f;
+}
+
+.btn-phu {
+    background: #eef1f5;
+    color: #445;
+}
+
+.btn-phu:hover {
+    background: #e2e7ed;
+}
+
+.cong-tac {
+    margin-left: auto !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 7px;
+}
+
+.cong-tac label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    text-transform: none;
+    font-size: 13px;
+    color: #334;
+    font-weight: 500;
+}
+
+.cong-tac input {
+    width: 16px;
+    height: 16px;
+    accent-color: #1e4976;
+}
+
+/* ---------------- Bản đồ ---------------- */
+.khung-ban-do {
+    flex: 1;
+    position: relative;
+}
+
+#banDo {
+    width: 100%;
+    height: 100%;
+}
+
+/* Bảng thống kê nổi góc trái trên bản đồ */
+.thong-ke {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 900;
+    background: rgba(255, 255, 255, .96);
+    padding: 12px 16px;
+    border-radius: 10px;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, .18);
+    font-size: 13px;
+    min-width: 175px;
+}
+
+.thong-ke h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #7a8999;
+    margin-bottom: 8px;
+}
+
+.thong-ke .dong {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    color: #334;
+}
+
+.thong-ke .dong b {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+}
+
+.cham {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, .25);
+    flex-shrink: 0;
+}
+
+/* Chú giải nổi góc phải */
+.hop-chu-giai {
+    background: rgba(255, 255, 255, .96);
+    padding: 12px 16px;
+    border-radius: 10px;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, .18);
+    font-size: 13px;
+    line-height: 22px;
+    min-width: 190px;
+}
+
+.hop-chu-giai b {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #7a8999;
+    margin-bottom: 6px;
+}
+
+.hop-chu-giai .dong {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hop-chu-giai i {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, .2);
+    flex-shrink: 0;
+}
+
+/* Popup */
+.leaflet-popup-content {
+    font-family: inherit;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin: 10px 14px;
+}
+
+.popup-tieu-de {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #0f2740;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.popup-dong {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.popup-dong span:first-child {
+    color: #7a8999;
+}
+
+/* ---------------- Chân trang ---------------- */
+.chan-trang {
+    padding: 8px 24px;
+    background: #fff;
+    border-top: 1px solid #e0e4e8;
+    font-size: 12px;
+    color: #7a8999;
+    text-align: center;
+}
+
+/* ---------------- Màn hình nhỏ ---------------- */
+@media (max-width: 900px) {
+    .tieu-de p { display: none; }
+    .thanh-loc { gap: 10px; padding: 10px 14px; }
+    .thanh-loc input[type="text"] { min-width: 130px; }
+    .thong-ke { font-size: 12px; min-width: 150px; }
+    .hop-chu-giai { display: none; }
+}
