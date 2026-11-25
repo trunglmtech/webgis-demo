@@ -4,11 +4,16 @@ Xây dựng **hệ thống WebGIS** phân tích và trực quan hóa mức độ
 
 Bản đồ nền lấy từ **OpenStreetMap**, dữ liệu là **15 điểm đo thực tế** (cường độ dBm) và vùng phủ sóng được nội suy bằng thuật toán **IDW (Inverse Distance Weighting)** chạy trực tiếp trên trình duyệt.
 
+![Giao diện WebGIS Demo](docs/demo-ban-do.png)
+
+> 🔗 **Xem trực tiếp:** <https://trunglmtech.github.io/webgis-demo/>
+
 ---
 
 ## Mục lục
 
 - [Tính năng](#tính-năng)
+- [Hình ảnh minh họa](#hình-ảnh-minh-họa)
 - [Công nghệ sử dụng](#công-nghệ-sử-dụng)
 - [Cấu trúc dự án](#cấu-trúc-dự-án)
 - [Cài đặt và chạy](#cài-đặt-và-chạy)
@@ -34,6 +39,24 @@ Bản đồ nền lấy từ **OpenStreetMap**, dữ liệu là **15 điểm đo
 | **Thống kê** | Đếm số điểm theo từng mức, cập nhật theo kết quả lọc |
 | **Bật/tắt lớp** | Công tắc bật/tắt hiển thị vùng phủ sóng |
 | **Giao diện tiếng Việt** | Toàn bộ giao diện và nội dung bằng tiếng Việt |
+
+---
+
+## Hình ảnh minh họa
+
+### Bản đồ vùng phủ sóng WiFi
+
+![Bản đồ vùng phủ sóng](docs/demo-ban-do.png)
+
+*Vùng màu được nội suy bằng IDW từ 15 điểm đo. Màu xanh = tín hiệu mạnh, màu đỏ = tín hiệu yếu.*
+
+### Bảng thống kê
+
+Bảng nổi góc trái trên bản đồ hiển thị số điểm theo từng mức và tự cập nhật khi lọc dữ liệu.
+
+### Chú giải
+
+Chú giải góc phải trên giải thích 5 mức tín hiệu và ký hiệu điểm đo.
 
 ---
 
@@ -192,6 +215,8 @@ Ngưỡng càng cao (gần 0) thì tín hiệu càng mạnh.
 ---
 
 ## Thuật toán IDW
+
+![Minh họa IDW](docs/demo-ban-do.png)
 
 ### Nguyên lý
 
