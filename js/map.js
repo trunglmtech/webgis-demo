@@ -59,9 +59,14 @@ function veVungPhu() {
     var duLieuAnh = anh.data;
 
     // Đổ màu từng ô
+    // LƯU Ý: lưới tính từ latMin (phía Nam) lên latMax (phía Bắc),
+    // nhưng ảnh thì hàng 0 nằm ở TRÊN (phía Bắc).
+    // Nên phải đảo thứ tự hàng khi vẽ, nếu không ảnh sẽ bị lật Bắc - Nam.
     for (var i = 0; i < soDong; i++) {
+        var hangLuoi = soDong - 1 - i;   // đảo hàng
+
         for (var j = 0; j < soCot; j++) {
-            var dbm = ketQua.luoi[i][j];
+            var dbm = ketQua.luoi[hangLuoi][j];
             var mauHex = layMau(dbm);
 
             // Đổi #rrggbb -> r, g, b
