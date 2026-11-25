@@ -44,7 +44,7 @@ chuGiai.addTo(map);
 var lopVungPhu = null;
 
 function veVungPhu() {
-    // Tính lưới 150 x 200 ô
+    // Tính lưới IDW: số hàng cố định, số cột tự tính theo tỉ lệ khung
     var ketQua = tinhIdw(DIEM_DO, 150, 200);
     var soDong = ketQua.soDong;
     var soCot = ketQua.soCot;
@@ -79,8 +79,8 @@ function veVungPhu() {
 
     ctx.putImageData(anh, 0, 0);
 
-    // Khung tọa độ: latMin/latMax là TÂM ô đầu và ô cuối
-    // nên phải mở rộng thêm nửa ô mỗi phía
+    // Khung tọa độ: latMin/latMax/lngMin/lngMax là TÂM ô đầu và TÂM ô cuối.
+    // Mỗi ô rộng đúng 1 bước lưới, nên khung ảnh phải mở rộng thêm nửa bước mỗi phía.
     var buocLat = (ketQua.latMax - ketQua.latMin) / (soDong - 1);
     var buocLng = (ketQua.lngMax - ketQua.lngMin) / (soCot - 1);
 

@@ -28,13 +28,20 @@ function tinhIdw(diem, soDong, soCot) {
         if (d.kinhDo > lngMax) lngMax = d.kinhDo;
     });
 
-    // 2. Mở rộng khung thêm 10% để vùng màu không bị cắt sát mép
-    var padLat = (latMax - latMin) * 0.10;
-    var padLng = (lngMax - lngMin) * 0.10;
+    // 2. Mở rộng khung một chút (5%) quanh các điểm đo
+    var padLat = (latMax - latMin) * 0.05;
+    var padLng = (lngMax - lngMin) * 0.05;
     latMin -= padLat; latMax += padLat;
     lngMin -= padLng; lngMax += padLng;
 
-    // 3. Tính giá trị dBm cho từng ô lưới
+    // 3. Tính lại số cột cho đúng tỉ lệ thực tế của khung
+    //    (mỗi ô lưới phải là hình vuông, nếu không ảnh sẽ bị méo)
+    var vLatMet = (latMax - latMin) * 111000;                                  // chiều cao (m)
+    var langMet = (lngMax - lngMin) * 111000 * Math.cos(((latMin + latMax) / 2) * Math.PI / 180); // chiều rộng (m)
+
+    soCot = Math.max(10, Math.round(soDong * (langMet / vLatMet)));
+
+    // 4. Tính giá trị dBm cho từng ô lưới
     var luoi = [];
 
     for (var i = 0; i < soDong; i++) {
