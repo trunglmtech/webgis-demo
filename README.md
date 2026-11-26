@@ -329,7 +329,15 @@ Dự án phục vụ mục đích học tập môn **Hệ thống thông tin đ�
 
 ---
 
-## Tác giả
+## Nhóm thực hiện
 
-**Lê Minh Trung**
+Dự án được thực hiện theo nhóm:
+
+| # | Họ và tên |
+|---|---|
+| 1 | **Lê Minh Trung** |
+| 2 | **Nguyễn Thái Bảo Hiền** |
+| 3 | **Lê Quang Dũng** |
+| 4 | **Nguyễn Xuân Hoà** |
+
 Trường Đại học Nha Trang — Ngành Công nghệ thông tin
